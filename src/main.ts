@@ -6,6 +6,7 @@ import { createPinia } from 'pinia';
 // Capacitor Stuff
 import { StatusBar, Style } from '@capacitor/status-bar';
 
+import '@quasar/extras/material-icons/material-icons.css';
 import '@quasar/extras/material-symbols-outlined/material-symbols-outlined.css';
 import './assets/first.css';
 import './assets/style.css';

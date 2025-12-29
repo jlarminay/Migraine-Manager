@@ -1,3 +1,3 @@
-import { useTestStore } from './test.store';
+import { useMemoryStore } from './memory.store';
 
-export { useTestStore };
+export { useMemoryStore };
