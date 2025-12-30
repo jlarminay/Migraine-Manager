@@ -20,15 +20,19 @@ const emits = defineEmits<{
           <q-btn
             unelevated
             no-caps
+            icon="sym_o_wb_sunny"
             label="Morning"
             class="w-full"
+            color="red-500"
             @click="emits('update', 'morning')"
           />
           <q-btn
             unelevated
             no-caps
+            icon="sym_o_bedtime"
             label="Evening"
             class="w-full"
+            color="blue-500"
             @click="emits('update', 'evening')"
           />
         </div>

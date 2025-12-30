@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useMemoryStore } from '@/stores';
+import { ChartCounts, ChartDayOfWeek, ChartMonths } from '@/components';
 
 const memoryStore = useMemoryStore();
-const allItems = ref<Array<{ date: string; type: 'evening' | 'morning' }>>([]);
+const allItems = ref<{ date: string; type: 'evening' | 'morning' }[]>([]);
 
 onMounted(() => {
   memoryStore.load();
@@ -17,15 +18,12 @@ function resetData() {
 
 <template>
   <div>
-    <div>
-      <p class="text-2xl">Stats</p>
-    </div>
+    <p class="text-2xl">Stats</p>
 
-    <div>
-      <p>All Migraines: {{ allItems.length }}</p>
-      <p>Break by day:</p>
-      <p>Break by evening/morning:</p>
-      <p>Show month graph from first to recent: (show current year, ytd)</p>
+    <div class="pb-4">
+      <ChartCounts />
+      <ChartDayOfWeek :data="allItems" class="mt-6" />
+      <ChartMonths :data="allItems" class="mt-6" />
     </div>
   </div>
 </template>

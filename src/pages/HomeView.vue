@@ -76,7 +76,9 @@ function removeDateValue() {
         :events="currentMonthItems.map((d) => d.date)"
         :event-color="
           (d) =>
-            currentMonthItems.find((item) => item.date === d)?.type === 'morning' ? 'blue' : 'red'
+            currentMonthItems.find((item) => item.date === d)?.type === 'evening'
+              ? 'blue-500'
+              : 'red-500'
         "
         :navigation-max-year-month="dayjs().format('YYYY/MM')"
         @update:model-value="selectDate"
@@ -89,16 +91,17 @@ function removeDateValue() {
           :key="item.date"
           class="mb-4 flex gap-2 items-center"
         >
-          <div
-            class="w-3 h-3 rounded-full"
+          <q-icon
+            :name="item.type === 'morning' ? 'sym_o_wb_sunny' : 'sym_o_bedtime'"
+            size="22px"
             :class="{
-              'bg-red-500': item.type === 'evening',
-              'bg-blue-500': item.type === 'morning',
+              'text-red-500': item.type === 'morning',
+              'text-blue-500': item.type === 'evening',
             }"
           />
-          <p class="mb-0">{{ dayjs(item.date).format('dddd Do') }}</p>
-          <span class="grow" />
           <p class="mb-0 capitalize">{{ item.type }}</p>
+          <span class="grow" />
+          <p class="mb-0">{{ dayjs(item.date).format('dddd Do') }}</p>
         </div>
         <p v-if="currentMonthItems.length === 0" class="text-center italic opacity-70">
           No migraines this month!
@@ -111,11 +114,4 @@ function removeDateValue() {
   </div>
 </template>
 
-<style scoped>
-.h-full {
-  height: 100%;
-}
-.min-h-0 {
-  min-height: 0;
-}
-</style>
+<style scoped></style>
