@@ -1,6 +1,8 @@
 # Migraine Manager
 
-![App Icon](assets/icon-only.png)
+<p align="center">
+  <img src="assets/icon-only.png" alt="App Icon" style="max-width:200px; max-height:200px; border-radius:20px;" />
+</p>
 
 ## About
 
@@ -17,8 +19,10 @@ I suffer from migraines and previously I used a text document to track my migrai
 
 ## Screenshots
 
-![Screenshot 1](assets/screenshot-1.jpg)
-![Screenshot 2](assets/screenshot-2.jpg)
+<p align="center">
+  <img src="assets/screenshot-1.jpg" alt="Screenshot 1" style="max-width:300px; margin-right:10px; display:inline-block;" />
+  <img src="assets/screenshot-2.jpg" alt="Screenshot 2" style="max-width:300px; display:inline-block;" />
+</p>
 
 ## Requirements
 
