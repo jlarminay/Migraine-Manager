@@ -1,42 +1,121 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { AddToCalendar, RemoveFromCalendar } from '@/components';
+import { useMemoryStore } from '@/stores';
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
+dayjs.extend(advancedFormat);
+
+const memoryStore = useMemoryStore();
+const showAddModal = ref(false);
+const showRemoveModal = ref(false);
 const date = ref<string>('');
+const selectedDate = ref<string>('');
 const currentView = ref<{ year: number; month: number }>({
   year: dayjs().year(),
   month: dayjs().month() + 1,
 });
+const currentMonthItems = ref<Array<{ date: string; type: 'evening' | 'morning' }>>([]);
 
+onMounted(() => {
+  memoryStore.load();
+  resetData();
+});
+
+function resetData() {
+  currentMonthItems.value = memoryStore.getMonth(currentView.value.year, currentView.value.month);
+  currentMonthItems.value.sort((a, b) => (a.date > b.date ? -1 : 1));
+}
+
+function changeCurrentView(event: { year: number; month: number }) {
+  currentView.value = { year: event.year, month: event.month };
+  resetData();
+}
 function selectDate(dateStr: string) {
-  console.log('Selected date:', dateStr);
-  date.value = '';
+  // check which modal to show
+
+  if (currentMonthItems.value.find((item) => item.date === dateStr)) {
+    showRemoveModal.value = true;
+    selectedDate.value = dateStr;
+    date.value = '';
+    return;
+  } else {
+    selectedDate.value = dateStr;
+    showAddModal.value = true;
+    date.value = '';
+    return;
+  }
+}
+function setDateValue(type: 'evening' | 'morning') {
+  if (!selectedDate.value) return;
+  memoryStore.set(selectedDate.value, type);
+  showAddModal.value = false;
+  resetData();
+}
+function removeDateValue() {
+  if (!selectedDate.value) return;
+  memoryStore.remove(selectedDate.value);
+  showRemoveModal.value = false;
+  resetData();
 }
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div>
-      <p class="text-2xl">Migraine Manager</p>
-    </div>
+  <div class="flex flex-col relative h-full min-h-0" v-auto-animate>
+    <p class="text-2xl">Migraine Manager</p>
 
-    <div class="grow flex flex-col">
-      <pre>{{ date }}</pre>
-      <pre>{{ currentView }}</pre>
+    <div class="flex-1 flex flex-col min-h-0">
       <q-date
         v-model="date"
         minimal
         flat
-        mask="YYYY-MM-DD"
+        mask="YYYY/MM/DD"
         class="w-full bg-transparent pb-0"
         color="purple"
+        :events="currentMonthItems.map((d) => d.date)"
+        :event-color="
+          (d) =>
+            currentMonthItems.find((item) => item.date === d)?.type === 'morning' ? 'blue' : 'red'
+        "
         :navigation-max-year-month="dayjs().format('YYYY/MM')"
         @update:model-value="selectDate"
-        @navigation="currentView = $event"
+        @navigation="changeCurrentView"
       />
-      <div class="grow border-t border-gray-700 pt-4">FULL LIST WILL GO HERE</div>
+
+      <div class="border-t border-gray-700 pt-4 flex-1 px-3 min-h-0 overflow-y-auto" v-auto-animate>
+        <div
+          v-for="item in currentMonthItems"
+          :key="item.date"
+          class="mb-4 flex gap-2 items-center"
+        >
+          <div
+            class="w-3 h-3 rounded-full"
+            :class="{
+              'bg-red-500': item.type === 'evening',
+              'bg-blue-500': item.type === 'morning',
+            }"
+          />
+          <p class="mb-0">{{ dayjs(item.date).format('dddd Do') }}</p>
+          <span class="grow" />
+          <p class="mb-0 capitalize">{{ item.type }}</p>
+        </div>
+        <p v-if="currentMonthItems.length === 0" class="text-center italic opacity-70">
+          No migraines this month!
+        </p>
+      </div>
     </div>
+
+    <AddToCalendar v-model="showAddModal" @update="setDateValue" />
+    <RemoveFromCalendar v-model="showRemoveModal" @remove="removeDateValue" />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.h-full {
+  height: 100%;
+}
+.min-h-0 {
+  min-height: 0;
+}
+</style>

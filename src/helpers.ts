@@ -3,11 +3,11 @@ import type { CalendarEntry, EntryType } from '@/types';
 const STORAGE_KEY = 'memoryStoreCalendarEntries';
 
 export function isValidDay(date: string): boolean {
-  return /^\d{4}-\d{2}-\d{2}$/.test(date);
+  return /^\d{4}\/\d{2}\/\d{2}$/.test(date);
 }
 
 export function isValidMonth(month: string): boolean {
-  return /^\d{4}-\d{2}$/.test(month);
+  return /^\d{4}\/\d{2}$/.test(month);
 }
 
 export function loadEntries(): CalendarEntry[] {
@@ -22,7 +22,7 @@ export function loadEntries(): CalendarEntry[] {
           e &&
           typeof e.date === 'string' &&
           isValidDay(e.date) &&
-          (e.type === 'e' || e.type === 'm'),
+          (e.type === 'evening' || e.type === 'morning'),
       )
       .map((e: any) => ({ date: e.date, type: e.type as EntryType }));
   } catch {

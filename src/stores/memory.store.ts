@@ -1,17 +1,23 @@
 import { defineStore } from 'pinia';
 import type { CalendarEntry, EntryType } from '@/types';
 import { isValidDay, isValidMonth, loadEntries, saveEntries } from '@/helpers';
+import dayjs from 'dayjs';
 
 export const useMemoryStore = defineStore('memory', {
   state: () => ({
-    entries: loadEntries() as CalendarEntry[],
+    entries: [] as CalendarEntry[],
   }),
 
   getters: {},
 
   actions: {
+    load() {
+      console.log('Loading entries from storage');
+      this.entries = loadEntries();
+    },
+
     set(date: string, type: EntryType) {
-      if (!isValidDay(date)) throw new Error("Invalid date format. Expected 'YYYY-MM-DD'.");
+      if (!isValidDay(date)) throw new Error("Invalid date format. Expected 'YYYY/MM/DD'.");
       if (type !== 'evening' && type !== 'morning')
         throw new Error("Invalid type. Expected 'evening' or 'morning'.");
 
@@ -37,10 +43,23 @@ export const useMemoryStore = defineStore('memory', {
       return [...this.entries];
     },
 
-    getMonth(month: string): CalendarEntry[] {
-      if (!isValidMonth(month)) throw new Error("Invalid month format. Expected 'YYYY-MM'.");
-      const prefix = `${month}-`;
-      return this.entries.filter((e) => e.date.startsWith(prefix));
+    getMonth(year: number, month: number): CalendarEntry[] {
+      this.load();
+      const monthStr = month.toString().padStart(2, '0');
+      const yearMonth = `${year}/${monthStr}`;
+      if (!isValidMonth(yearMonth)) {
+        throw new Error('Invalid year/month format. Expected 4-digit year and 1-2 digit month.');
+      }
+      console.log(this.entries);
+      return this.entries.filter((e) => {
+        const entryDate = dayjs(e.date, 'YYYY/MM/DD');
+        return entryDate.isValid() && entryDate.year() === year && entryDate.month() + 1 === month;
+      });
+    },
+
+    clearMemory() {
+      this.entries = [];
+      saveEntries(this.entries);
     },
   },
 });

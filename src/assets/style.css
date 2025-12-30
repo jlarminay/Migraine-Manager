@@ -1,2 +1,10 @@
 @import 'tailwindcss';
 @custom-variant dark (&:where(.dark, .dark *));
+
+// Overrides for Quasar components
+body {
+  /* border: 2px solid red; */
+}
+div.q-date__view {
+  padding: 0 !important;
+}
