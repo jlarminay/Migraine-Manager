@@ -1,7 +1,10 @@
 import { defineStore } from 'pinia';
 import type { CalendarEntry, EntryType } from '@/types';
-import { isValidDay, isValidMonth, loadEntries, saveEntries } from '@/helpers';
+import { toaster, isValidDay, isValidMonth, loadEntries, saveEntries } from '@/helpers';
 import dayjs from 'dayjs';
+
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 export const useMemoryStore = defineStore('memory', {
   state: () => ({
@@ -12,7 +15,6 @@ export const useMemoryStore = defineStore('memory', {
 
   actions: {
     load() {
-      console.log('Loading entries from storage');
       this.entries = loadEntries();
     },
 
@@ -50,7 +52,6 @@ export const useMemoryStore = defineStore('memory', {
       if (!isValidMonth(yearMonth)) {
         throw new Error('Invalid year/month format. Expected 4-digit year and 1-2 digit month.');
       }
-      console.log(this.entries);
       return this.entries.filter((e) => {
         const entryDate = dayjs(e.date, 'YYYY/MM/DD');
         return entryDate.isValid() && entryDate.year() === year && entryDate.month() + 1 === month;
@@ -67,6 +68,70 @@ export const useMemoryStore = defineStore('memory', {
     clearMemory() {
       this.entries = [];
       saveEntries(this.entries);
+    },
+
+    async export() {
+      try {
+        const header = 'date,type\n';
+        const rows = this.entries
+          .map((e) => `${e.date},${e.type}`)
+          .sort()
+          .join('\n');
+
+        const csv = header + rows;
+        const filename = `backup-${dayjs().format('YYYY-MM-DD_HH-mm-ss')}.csv`;
+
+        // Download for web, save to file for native
+        if (!Capacitor.isNativePlatform()) {
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.click();
+
+          URL.revokeObjectURL(url);
+          toaster('success', `Downloaded as ${filename}`);
+          return;
+        }
+
+        // Native platforms
+        await Filesystem.writeFile({
+          path: `MigraineManager/${filename}`,
+          data: csv,
+          directory: Directory.Documents,
+          encoding: Encoding.UTF8,
+          recursive: true,
+        });
+        toaster('success', `Saved as ${filename}`);
+      } catch (err: any) {
+        toaster('error', `Export failed: ${err?.message || String(err)}`);
+      }
+    },
+    async import(file: File) {
+      try {
+        const text = await file.text();
+        const lines = text.split('\n').map((l) => l.trim());
+        const newEntries: CalendarEntry[] = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const line = lines[i];
+          if (!line) continue;
+
+          const [date, type] = line.split(',') as [string, string];
+
+          if (isValidDay(date) && (type === 'evening' || type === 'morning')) {
+            newEntries.push({ date, type: type as EntryType });
+          }
+        }
+
+        this.entries = newEntries;
+        saveEntries(this.entries);
+        toaster('success', `Imported ${newEntries.length} entries.`);
+      } catch (err: any) {
+        toaster('error', err?.message || String(err));
+      }
     },
   },
 });

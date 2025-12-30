@@ -1,5 +1,13 @@
 import type { CalendarEntry, EntryType } from '@/types';
 
+// @ts-ignore
+import { createToaster } from '@meforma/vue-toaster';
+
+const toasterObject = createToaster({
+  position: 'top',
+  duration: 3000,
+});
+
 const STORAGE_KEY = 'memoryStoreCalendarEntries';
 
 export function isValidDay(date: string): boolean {
@@ -32,4 +40,20 @@ export function loadEntries(): CalendarEntry[] {
 
 export function saveEntries(entries: CalendarEntry[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+}
+
+export function toaster(type: 'success' | 'error', message: string) {
+  if (type === 'error') {
+    toasterObject.error(`
+      <p>Import failed</p>
+      <span>${message}</span>
+    `);
+  } else {
+    toasterObject.success(`
+      <p>Success</p>
+      <span>${message}</span>
+    `);
+  }
+
+  return;
 }
