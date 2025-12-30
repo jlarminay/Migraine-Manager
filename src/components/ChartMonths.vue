@@ -81,7 +81,7 @@ const monthsAllTime = computed<MonthData[]>(() => {
         labels: monthsAllTime.map((m) => m.label),
         datasets: [
           {
-            label: 'Migraines',
+            label: 'Count',
             data: monthsAllTime.map((m) => m.count),
             fill: false,
             borderColor: '#7c3aed',

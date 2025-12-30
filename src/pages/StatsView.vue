@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useMemoryStore } from '@/stores';
-import { ChartCounts, ChartDayOfWeek, ChartMonths } from '@/components';
+import { ChartCounts, ChartDayOfWeek, ChartMonths, ChartDateType } from '@/components';
 
 const memoryStore = useMemoryStore();
 const allItems = ref<{ date: string; type: 'evening' | 'morning' }[]>([]);
@@ -24,6 +24,7 @@ function resetData() {
       <ChartCounts />
       <ChartDayOfWeek :data="allItems" class="mt-6" />
       <ChartMonths :data="allItems" class="mt-6" />
+      <ChartDateType :data="allItems" class="mt-6" />
     </div>
   </div>
 </template>

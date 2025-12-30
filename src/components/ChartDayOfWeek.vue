@@ -44,6 +44,7 @@ const numbersByDay = computed(() => {
         labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
         datasets: [
           {
+            label: 'Count',
             data: Object.values(numbersByDay),
             backgroundColor: [
               'rgba(255, 99, 132, 0.2)',

@@ -4,6 +4,7 @@ import ClearMemoryModal from './ClearMemoryModal.vue';
 import ChartDayOfWeek from './ChartDayOfWeek.vue';
 import ChartMonths from './ChartMonths.vue';
 import ChartCounts from './ChartCounts.vue';
+import ChartDateType from './ChartDateType.vue';
 
 export {
   AddToCalendar,
@@ -12,4 +13,5 @@ export {
   ChartDayOfWeek,
   ChartMonths,
   ChartCounts,
+  ChartDateType,
 };

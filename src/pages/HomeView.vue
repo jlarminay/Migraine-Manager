@@ -77,8 +77,8 @@ function removeDateValue() {
         :event-color="
           (d) =>
             currentMonthItems.find((item) => item.date === d)?.type === 'evening'
-              ? 'blue-500'
-              : 'red-500'
+              ? 'blue-5'
+              : 'red-5'
         "
         :navigation-max-year-month="dayjs().format('YYYY/MM')"
         @update:model-value="selectDate"

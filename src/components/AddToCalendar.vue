@@ -23,7 +23,7 @@ const emits = defineEmits<{
             icon="sym_o_wb_sunny"
             label="Morning"
             class="w-full"
-            color="red-500"
+            color="red-5"
             @click="emits('update', 'morning')"
           />
           <q-btn
@@ -32,7 +32,7 @@ const emits = defineEmits<{
             icon="sym_o_bedtime"
             label="Evening"
             class="w-full"
-            color="blue-500"
+            color="blue-5"
             @click="emits('update', 'evening')"
           />
         </div>
