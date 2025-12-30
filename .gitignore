@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 android
+secure
 *.local
 
 # Editor directories and files
