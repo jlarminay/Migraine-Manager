@@ -8,7 +8,7 @@
     "build": "npm run build:vue && npm run build:assets && npm run build:android",
     "build:vue": "vue-tsc -b && vite build",
     "build:assets": "npx capacitor-assets generate",
-    "build:android": "npx cap sync && cd android && gradlew.bat assembleDebug",
+    "build:android": "npx cap sync && cd android && ./gradlew assembleDebug",
     "send-to-android": "adb install -r android/app/build/outputs/apk/debug/app-debug.apk",
     "build-and-send": "npm run build && npm run send-to-android",
     "build:prod": "node build-android.js",
