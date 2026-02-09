@@ -65,11 +65,26 @@ const showClearModal = ref(false);
         <p class="text-lg mb-2">System Data</p>
         <div class="flex justify-between">
           <p>Version</p>
-          <p class="opacity-70">1.0.0</p>
+          <p class="opacity-70">1.1.0</p>
         </div>
+      </div>
+
+      <div class="mt-6">
         <div class="flex justify-between">
-          <p>Last Update</p>
-          <p class="opacity-70">2025-12-30</p>
+          <a
+            href="https://github.com/jlarminay/Migraine-Manager"
+            target="_blank"
+            class="w-1/2 text-center text-lg"
+          >
+            Github
+            <br />
+            <q-icon name="img:/github.svg" size="34px" class="invert" />
+          </a>
+          <a href="https://joshlarminay.com" target="_blank" class="w-1/2 text-center text-lg">
+            Website
+            <br />
+            <q-icon name="sym_o_language" size="34px" />
+          </a>
         </div>
       </div>
     </div>
