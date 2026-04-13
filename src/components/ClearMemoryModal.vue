@@ -15,8 +15,15 @@ const emits = defineEmits<{
         Are you sure you want to clear all stored migraine data? This action cannot be undone.
 
         <div class="flex flex-col gap-2 mt-4">
-          <q-btn unelevated no-caps label="Yes" class="w-full" @click="emits('clear')" />
-          <q-btn unelevated no-caps label="No" class="w-full" v-close-popup />
+          <q-btn
+            unelevated
+            no-caps
+            label="Yes, delete everything"
+            class="w-full"
+            color="negative"
+            @click="emits('clear')"
+          />
+          <q-btn unelevated no-caps label="No, keep my data" class="w-full" v-close-popup />
         </div>
       </q-card-section>
     </q-card>

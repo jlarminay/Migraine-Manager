@@ -8,6 +8,10 @@ import ChartDateType from './ChartDateType.vue';
 import ChartStreaks from './ChartStreaks.vue';
 import ChartAverages from './ChartAverages.vue';
 import ChangelogModal from './ChangelogModal.vue';
+import AiSetupModal from './AiSetupModal.vue';
+import AiRemoveModal from './AiRemoveModal.vue';
+import ImportExportButtons from './ImportExportButtons.vue';
+import SystemData from './SystemData.vue';
 
 export {
   AddToCalendar,
@@ -20,4 +24,8 @@ export {
   ChartStreaks,
   ChartAverages,
   ChangelogModal,
+  AiSetupModal,
+  AiRemoveModal,
+  ImportExportButtons,
+  SystemData,
 };

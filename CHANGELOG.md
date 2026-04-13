@@ -2,6 +2,10 @@
 
 # Changelog
 
+## [2.0.0] - unreleased
+
+- Add ai assistant to analyze your entires
+
 ## [1.3.1] - 2026-04-12
 
 - Add more details to streak stats

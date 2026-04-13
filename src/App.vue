@@ -1,4 +1,22 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useAiStore } from '@/stores';
+
+const route = useRoute();
+const router = useRouter();
+const aiStore = useAiStore();
+
+// Redirect away from /ai if AI is disabled while on that page
+watch(
+  () => aiStore.enabled,
+  (enabled) => {
+    if (!enabled && route.path === '/ai') {
+      router.replace('/');
+    }
+  },
+);
+</script>
 
 <template>
   <main
@@ -16,10 +34,40 @@
       class="fixed bottom-0 w-full bg-black"
       style="padding-bottom: var(--safe-area-inset-bottom, 28px)"
     >
-      <div class="h-14">
-        <q-btn flat icon="sym_o_calendar_month" to="/" square class="w-1/3 p-4" />
-        <q-btn flat icon="sym_o_bar_chart" to="/stats" square class="w-1/3 p-4" />
-        <q-btn flat icon="sym_o_settings" to="/settings" square class="w-1/3 p-4" />
+      <div class="h-14 flex">
+        <q-btn
+          flat
+          icon="sym_o_calendar_month"
+          to="/"
+          square
+          class="flex-1 p-4"
+          :class="route.path === '/' ? 'text-white' : 'text-gray-500'"
+        />
+        <q-btn
+          flat
+          icon="sym_o_bar_chart"
+          to="/stats"
+          square
+          class="flex-1 p-4"
+          :class="route.path === '/stats' ? 'text-white' : 'text-gray-500'"
+        />
+        <q-btn
+          v-if="aiStore.enabled"
+          flat
+          icon="sym_o_smart_toy"
+          to="/ai"
+          square
+          class="flex-1 p-4"
+          :class="route.path === '/ai' ? 'text-white' : 'text-gray-500'"
+        />
+        <q-btn
+          flat
+          icon="sym_o_settings"
+          to="/settings"
+          square
+          class="flex-1 p-4"
+          :class="route.path === '/settings' ? 'text-white' : 'text-gray-500'"
+        />
       </div>
     </div>
   </main>

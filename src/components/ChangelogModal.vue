@@ -2,18 +2,11 @@
 import { marked } from 'marked';
 import changelogRaw from '../../CHANGELOG.md?raw';
 
-defineProps<{ modelValue: boolean }>();
-defineEmits(['update:modelValue']);
-
 const html = marked(changelogRaw.replace(/^<!-- .* -->\n/, ''));
 </script>
 
 <template>
-  <q-dialog
-    :model-value="modelValue"
-    class="shadow-none"
-    @update:model-value="$emit('update:modelValue', $event)"
-  >
+  <q-dialog class="shadow-none">
     <q-card class="w-full max-w-md shadow-none">
       <q-card-section class="flex items-center justify-between pb-0">
         <p class="text-xl font-semibold mb-0">Changelog</p>
