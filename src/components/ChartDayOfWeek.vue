@@ -11,34 +11,25 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js';
+import { useMemoryStore } from '@/stores';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-const props = defineProps<{
-  data: { date: string; type: 'evening' | 'morning' }[];
-}>();
+const memoryStore = useMemoryStore();
 
 const numbersByDay = computed(() => {
-  const dayCounts: Record<number, number> = {
-    0: 0,
-    1: 0,
-    2: 0,
-    3: 0,
-    4: 0,
-    5: 0,
-    6: 0,
-  };
-  props.data.forEach((item) => {
-    // @ts-ignore
-    dayCounts[dayjs(item.date).day()]++;
+  const dayCounts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0 };
+  memoryStore.entries.forEach((item) => {
+    const day = dayjs(item.date, 'YYYY/MM/DD').day();
+    dayCounts[day] = (dayCounts[day] ?? 0) + 1;
   });
   return dayCounts;
 });
 </script>
 
 <template>
-  <div>
-    <p class="text-lg mb-2">Migraines By Weekday</p>
+  <div class="rounded-lg border border-current/10 p-3">
+    <p class="text-lg mb-2">By Weekday</p>
     <Bar
       :data="{
         labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],

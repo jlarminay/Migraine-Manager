@@ -4,8 +4,8 @@
   <main
     class="h-screen"
     style="
-      padding-top: env(safe-area-inset-top, 24px);
-      padding-bottom: calc(env(safe-area-inset-bottom, 16px) + 56px);
+      padding-top: var(--safe-area-inset-top, 24px);
+      padding-bottom: calc(var(--safe-area-inset-bottom, 28px) + 56px);
     "
   >
     <div class="py-4 h-full overflow-y-scroll">
@@ -14,7 +14,7 @@
 
     <div
       class="fixed bottom-0 w-full bg-black"
-      style="padding-bottom: env(safe-area-inset-bottom, 16px)"
+      style="padding-bottom: var(--safe-area-inset-bottom, 28px)"
     >
       <div class="h-14">
         <q-btn flat icon="sym_o_calendar_month" to="/" square class="w-1/3 p-4" />

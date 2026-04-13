@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useMemoryStore } from '@/stores';
-import { ClearMemoryModal } from '@/components';
+import { ClearMemoryModal, ChangelogModal } from '@/components';
 
 const memoryStore = useMemoryStore();
 const fileInput = ref<HTMLInputElement | null>(null);
 const showClearModal = ref(false);
+const showChangelogModal = ref(false);
 </script>
 
 <template>
@@ -15,7 +16,7 @@ const showClearModal = ref(false);
     </div>
 
     <div class="flex-col gap-4">
-      <div class="mt-6">
+      <div class="mt-4">
         <p class="text-lg mb-2">Data Management</p>
         <q-btn
           unelevated
@@ -63,27 +64,33 @@ const showClearModal = ref(false);
 
       <div class="mt-6">
         <p class="text-lg mb-2">System Data</p>
-        <div class="flex justify-between">
+        <div class="flex justify-between" @click="showChangelogModal = true">
           <p>Version</p>
-          <p class="opacity-70">1.1.0</p>
+          <p class="opacity-70">
+            1.3.1
+            <q-icon name="sym_o_info" class="mb-1" />
+          </p>
         </div>
       </div>
 
       <div class="mt-6">
-        <div class="flex justify-between">
+        <p class="text-lg mb-2">Links</p>
+        <div class="flex justify-between gap-2">
           <a
             href="https://github.com/jlarminay/Migraine-Manager"
             target="_blank"
-            class="w-1/2 text-center text-lg"
+            class="flex-1 flex flex-col items-center gap-1 py-3 rounded-lg border border-gray-200 dark:border-gray-700 no-underline text-inherit"
           >
-            Github
-            <br />
-            <q-icon name="img:/github.svg" size="34px" class="invert" />
+            <q-icon name="img:/github.svg" size="28px" class="invert" />
+            <span class="text-sm">Github</span>
           </a>
-          <a href="https://joshlarminay.com" target="_blank" class="w-1/2 text-center text-lg">
-            Website
-            <br />
-            <q-icon name="sym_o_language" size="34px" />
+          <a
+            href="https://joshlarminay.com"
+            target="_blank"
+            class="flex-1 flex flex-col items-center gap-1 py-3 rounded-lg border border-gray-200 dark:border-gray-700 no-underline text-inherit"
+          >
+            <q-icon name="sym_o_language" size="28px" />
+            <span class="text-sm">Website</span>
           </a>
         </div>
       </div>
@@ -96,6 +103,8 @@ const showClearModal = ref(false);
         showClearModal = false;
       "
     />
+
+    <ChangelogModal v-model="showChangelogModal" />
   </div>
 </template>
 

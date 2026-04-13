@@ -17,6 +17,28 @@ const currentView = ref<{ year: number; month: number }>({
   month: dayjs().month() + 1,
 });
 const currentMonthItems = ref<Array<{ date: string; type: 'evening' | 'morning' }>>([]);
+const qDateRef = ref<any>(null);
+
+function handleSwipe({ direction }: { direction: string }) {
+  const delta = direction === 'left' ? 1 : -1;
+  let { year, month } = currentView.value;
+  month += delta;
+  if (month > 12) {
+    month = 1;
+    year++;
+  }
+  if (month < 1) {
+    month = 12;
+    year--;
+  }
+
+  const now = dayjs();
+  if (year > now.year() || (year === now.year() && month > now.month() + 1)) return;
+
+  currentView.value = { year, month };
+  resetData();
+  qDateRef.value?.setCalendarTo(year, month);
+}
 
 onMounted(() => {
   memoryStore.load();
@@ -59,14 +81,21 @@ function removeDateValue() {
   showRemoveModal.value = false;
   resetData();
 }
+function setToday() {
+  qDateRef.value?.setCalendarTo(dayjs().year(), dayjs().month() + 1);
+}
 </script>
 
 <template>
   <div class="flex flex-col relative h-full min-h-0" v-auto-animate>
-    <p class="text-2xl">Migraine Manager</p>
+    <div class="flex justify-between items-center mb-4">
+      <p class="text-2xl m-0 p-0">Migraine Manager</p>
+      <q-btn no-caps outline color="white" label="Today" size="12px" @click="setToday" />
+    </div>
 
-    <div class="flex-1 flex flex-col min-h-0">
+    <div class="flex-1 flex flex-col min-h-0" v-touch-swipe.horizontal="handleSwipe">
       <q-date
+        ref="qDateRef"
         v-model="date"
         minimal
         flat

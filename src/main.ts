@@ -30,3 +30,12 @@ app.mount('#app');
 // Set status bar style and background
 StatusBar.setStyle({ style: Style.Dark }); // dark icons
 StatusBar.setBackgroundColor({ color: '#000000' }); // background color
+
+// Apply real Android system bar insets as CSS variables
+const win = window as any;
+if (win.AndroidSafeArea) {
+  const bottom = win.AndroidSafeArea.getBottomInset();
+  const top = win.AndroidSafeArea.getTopInset();
+  document.documentElement.style.setProperty('--safe-area-inset-bottom', `${bottom}px`);
+  document.documentElement.style.setProperty('--safe-area-inset-top', `${top}px`);
+}

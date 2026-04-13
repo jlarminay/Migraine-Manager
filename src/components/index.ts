@@ -5,6 +5,8 @@ import ChartDayOfWeek from './ChartDayOfWeek.vue';
 import ChartMonths from './ChartMonths.vue';
 import ChartCounts from './ChartCounts.vue';
 import ChartDateType from './ChartDateType.vue';
+import ChartStreaks from './ChartStreaks.vue';
+import ChangelogModal from './ChangelogModal.vue';
 
 export {
   AddToCalendar,
@@ -14,4 +16,6 @@ export {
   ChartMonths,
   ChartCounts,
   ChartDateType,
+  ChartStreaks,
+  ChangelogModal,
 };

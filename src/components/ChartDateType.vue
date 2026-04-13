@@ -10,17 +10,16 @@ import {
   CategoryScale,
   LinearScale,
 } from 'chart.js';
+import { useMemoryStore } from '@/stores';
 
 ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
-const props = defineProps<{
-  data: { date: string; type: 'evening' | 'morning' }[];
-}>();
+const memoryStore = useMemoryStore();
 
 const typeCounts = computed(() => {
   let evening = 0;
   let morning = 0;
-  for (const item of props.data) {
+  for (const item of memoryStore.entries) {
     if (item.type === 'evening') evening++;
     else if (item.type === 'morning') morning++;
   }
@@ -29,7 +28,7 @@ const typeCounts = computed(() => {
 </script>
 
 <template>
-  <div>
+  <div class="rounded-lg border border-current/10 p-3">
     <p class="text-lg mb-2">Evening vs Morning</p>
     <Bar
       :data="{
