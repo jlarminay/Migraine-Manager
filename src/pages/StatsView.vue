@@ -7,6 +7,7 @@ import {
   ChartMonths,
   ChartDateType,
   ChartStreaks,
+  ChartAverages,
 } from '@/components';
 
 const memoryStore = useMemoryStore();
@@ -22,6 +23,7 @@ onMounted(() => {
 
     <div class="pb-4">
       <ChartCounts />
+      <ChartAverages class="mt-2" />
       <ChartStreaks class="mt-2" />
       <ChartDayOfWeek class="mt-2" />
       <ChartMonths class="mt-2" />

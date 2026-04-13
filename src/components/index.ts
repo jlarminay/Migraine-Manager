@@ -6,6 +6,7 @@ import ChartMonths from './ChartMonths.vue';
 import ChartCounts from './ChartCounts.vue';
 import ChartDateType from './ChartDateType.vue';
 import ChartStreaks from './ChartStreaks.vue';
+import ChartAverages from './ChartAverages.vue';
 import ChangelogModal from './ChangelogModal.vue';
 
 export {
@@ -17,5 +18,6 @@ export {
   ChartCounts,
   ChartDateType,
   ChartStreaks,
+  ChartAverages,
   ChangelogModal,
 };

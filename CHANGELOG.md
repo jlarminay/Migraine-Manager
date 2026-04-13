@@ -5,6 +5,7 @@
 ## [1.3.1] - 2026-04-12
 
 - Add more details to streak stats
+- Add average stats
 
 ## [1.3.0] - 2026-04-11
 
