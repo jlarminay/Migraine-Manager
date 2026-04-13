@@ -68,6 +68,52 @@ const monthDelta = computed(() =>
 );
 const yearDelta = computed(() => calcDelta(thisYear.value.length, proratedLastYear.value.length));
 
+const monthComparison = computed(() => {
+  const today = dayjs();
+  const pctElapsed = today.date() / today.daysInMonth();
+  const lastMonthEnd = Math.floor(pctElapsed * today.subtract(1, 'month').daysInMonth());
+  const prev = today.subtract(1, 'month');
+
+  return [
+    {
+      label: 'This Month',
+      count: thisMonth.value.length,
+      range: `${today.format('MMM')} 1–${today.date()}, ${today.year()}`,
+    },
+    {
+      label: 'Last Month',
+      count: proratedLastMonth.value.length,
+      range: `${prev.format('MMM')} 1–${lastMonthEnd}, ${prev.year()}`,
+    },
+  ];
+});
+
+const yearComparison = computed(() => {
+  const today = dayjs();
+  const startOfYear = today.startOf('year');
+  const daysElapsed = today.diff(startOfYear, 'day') + 1;
+  const daysInThisYear = today.endOf('year').diff(startOfYear, 'day') + 1;
+  const pctElapsed = daysElapsed / daysInThisYear;
+
+  const lastYearStart = today.subtract(1, 'year').startOf('year');
+  const daysInLastYear = today.subtract(1, 'year').endOf('year').diff(lastYearStart, 'day') + 1;
+  const cutoffDay = Math.floor(pctElapsed * daysInLastYear);
+  const lastYearCutoff = lastYearStart.add(cutoffDay - 1, 'day');
+
+  return [
+    {
+      label: 'This Year',
+      count: thisYear.value.length,
+      range: `Jan 1 – ${today.format('MMM D')}, ${today.year()}`,
+    },
+    {
+      label: 'Last Year',
+      count: proratedLastYear.value.length,
+      range: `Jan 1 – ${lastYearCutoff.format('MMM D')}, ${lastYearStart.year()}`,
+    },
+  ];
+});
+
 const infos = {
   month: {
     title: 'This Month',
@@ -139,6 +185,18 @@ const showDialog = computed({
         </q-card-section>
         <q-card-section class="q-pt-none">
           {{ activeInfo ? infos[activeInfo].description : '' }}
+        </q-card-section>
+        <q-card-section v-if="activeInfo === 'month'" class="q-pt-none">
+          <p v-for="row in monthComparison" :key="row.range" class="mb-1 text-xs last:mb-0">
+            <span class="opacity-30">{{ row.label }}</span>
+            <span class="opacity-50 ml-2">{{ row.count }} — {{ row.range }}</span>
+          </p>
+        </q-card-section>
+        <q-card-section v-if="activeInfo === 'year'" class="q-pt-none">
+          <p v-for="row in yearComparison" :key="row.range" class="mb-1 text-xs last:mb-0">
+            <span class="opacity-30">{{ row.label }}</span>
+            <span class="opacity-50 ml-2">{{ row.count }} — {{ row.range }}</span>
+          </p>
         </q-card-section>
       </q-card>
     </q-dialog>

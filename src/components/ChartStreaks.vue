@@ -12,52 +12,83 @@ const sortedDates = computed(() =>
     .sort((a, b) => a.diff(b)),
 );
 
+const fmt = (d: ReturnType<typeof dayjs>) => d.format('MMM D, YYYY');
+
 // Days since the last migraine (current streak)
-const currentStreak = computed(() => {
+const currentStreakData = computed(() => {
   if (!sortedDates.value.length) return null;
-  return dayjs()
-    .startOf('day')
-    .diff(sortedDates.value[sortedDates.value.length - 1], 'day');
+  const last = sortedDates.value[sortedDates.value.length - 1]!;
+  const days = dayjs().startOf('day').diff(last, 'day');
+  const start = last.add(1, 'day');
+  return { days, range: days > 0 ? `${fmt(start)} – now` : null };
 });
 
-// Longest gap between consecutive memoryStore.entries (migraine-free days)
-const bestStreak = computed(() => {
-  if (!sortedDates.value || !sortedDates.value.length) return null;
+// Longest gap between consecutive entries (migraine-free days)
+const bestStreakData = computed(() => {
+  if (!sortedDates.value.length) return null;
 
   let max = 0;
+  let rangeStart: ReturnType<typeof dayjs> | null = null;
+  let rangeEnd: ReturnType<typeof dayjs> | null = null;
+
   for (let i = 1; i < sortedDates.value.length; i++) {
-    const curr = sortedDates.value[i];
-    const prev = sortedDates.value[i - 1];
-    if (!curr || !prev) continue;
+    const curr = sortedDates.value[i]!;
+    const prev = sortedDates.value[i - 1]!;
     const gap = curr.diff(prev, 'day') - 1;
-    if (gap > max) max = gap;
+    if (gap > max) {
+      max = gap;
+      rangeStart = prev.add(1, 'day');
+      rangeEnd = curr.subtract(1, 'day');
+    }
   }
-  // Include the current ongoing streak from the last entry to today
-  const current = dayjs()
-    .startOf('day')
-    .diff(sortedDates.value[sortedDates.value.length - 1], 'day');
-  if (current > max) max = current;
-  return max;
+
+  const last = sortedDates.value[sortedDates.value.length - 1]!;
+  const currentDays = dayjs().startOf('day').diff(last, 'day');
+  if (currentDays > max) {
+    max = currentDays;
+    rangeStart = last.add(1, 'day');
+    rangeEnd = null; // ongoing
+  }
+
+  const range = max > 0 && rangeStart
+    ? rangeEnd ? `${fmt(rangeStart)} – ${fmt(rangeEnd)}` : `${fmt(rangeStart)} – now`
+    : null;
+  return { days: max, range };
 });
 
 // Longest run of consecutive days with migraines
-const worstStreak = computed(() => {
-  if (!sortedDates.value || !sortedDates.value.length) return null;
+const worstStreakData = computed(() => {
+  if (!sortedDates.value.length) return null;
 
   let max = 1;
   let current = 1;
+  let currentStart = sortedDates.value[0]!;
+  let bestStart = sortedDates.value[0]!;
+  let bestEnd = sortedDates.value[0]!;
+
   for (let i = 1; i < sortedDates.value.length; i++) {
-    const curr = sortedDates.value[i];
-    const prev = sortedDates.value[i - 1];
-    if (curr && prev && curr.diff(prev, 'day') === 1) {
+    const curr = sortedDates.value[i]!;
+    const prev = sortedDates.value[i - 1]!;
+    if (curr.diff(prev, 'day') === 1) {
       current++;
-      if (current > max) max = current;
+      if (current > max) {
+        max = current;
+        bestStart = currentStart;
+        bestEnd = curr;
+      }
     } else {
       current = 1;
+      currentStart = curr;
     }
   }
-  return max;
+
+  const range = max > 1 ? `${fmt(bestStart)} – ${fmt(bestEnd)}` : null;
+  return { days: max, range };
 });
+
+const currentStreak = computed(() => currentStreakData.value?.days ?? null);
+const bestStreak = computed(() => bestStreakData.value?.days ?? null);
+const worstStreak = computed(() => worstStreakData.value?.days ?? null);
 
 const infos = {
   current: {
@@ -131,6 +162,18 @@ const showDialog = computed({
         </q-card-section>
         <q-card-section class="q-pt-none">
           {{ activeInfo ? infos[activeInfo].description : '' }}
+        </q-card-section>
+        <q-card-section
+          v-if="activeInfo && (activeInfo === 'current' ? currentStreakData?.range : activeInfo === 'best' ? bestStreakData?.range : worstStreakData?.range)"
+          class="q-pt-none"
+        >
+          <p class="mb-0 text-xs opacity-50">
+            {{
+              activeInfo === 'current' ? currentStreakData?.range
+              : activeInfo === 'best' ? bestStreakData?.range
+              : worstStreakData?.range
+            }}
+          </p>
         </q-card-section>
       </q-card>
     </q-dialog>
