@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed } from 'vue';
 import { useAiStore } from '@/stores';
 import type { AiProvider } from '@/stores';
 
@@ -47,10 +47,6 @@ function confirm() {
   aiStore.setKey(tempProvider.value, tempKey.value.trim());
   aiStore.setEnabled(true);
   emits('close');
-}
-
-function back() {
-  step.value = 1;
 }
 </script>
 
