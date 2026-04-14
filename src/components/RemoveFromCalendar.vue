@@ -15,14 +15,15 @@ const emits = defineEmits<{
         Do you want to remove the migraine entry for this date?
 
         <div class="flex flex-col gap-2 mt-4">
-          <q-btn outline no-caps label="No, keep it" class="w-full" v-close-popup />
           <q-btn
             unelevated
             no-caps
+            color="primary"
             label="Yes, remove it"
             class="w-full"
             @click="emits('remove')"
           />
+          <q-btn flat no-caps label="No, keep it" class="w-full" v-close-popup />
         </div>
       </q-card-section>
     </q-card>

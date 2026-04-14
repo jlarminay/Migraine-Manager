@@ -4,6 +4,9 @@ const config: CapacitorConfig = {
   appId: 'com.joshlarminay.migrainemanager',
   appName: 'Migraine Manager',
   webDir: 'dist',
+  android: {
+    allowMixedContent: true,
+  },
 };
 
 export default config;

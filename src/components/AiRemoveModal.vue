@@ -7,6 +7,7 @@ const emits = defineEmits<{ (e: 'close'): void }>();
 
 function confirm() {
   aiStore.clearKey();
+  aiStore.clearResponse();
   emits('close');
 }
 </script>
@@ -22,7 +23,14 @@ function confirm() {
         Are you sure? This will disable the AI assistant and delete your stored API key.
 
         <div class="flex flex-col gap-2 mt-4">
-          <q-btn unelevated no-caps label="Yes, disable" color="negative" class="w-full" @click="confirm" />
+          <q-btn
+            unelevated
+            no-caps
+            label="Yes, disable"
+            color="negative"
+            class="w-full"
+            @click="confirm"
+          />
           <q-btn unelevated no-caps label="Cancel" class="w-full" v-close-popup />
         </div>
       </q-card-section>

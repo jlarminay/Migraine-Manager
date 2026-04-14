@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import type { CalendarEntry } from '@/types';
 
-export type AiProvider = 'gemini' | 'openai' | 'claude';
+export type AiProvider = 'gemini' | 'openai' | 'claude' | 'ollama';
 
 const STORAGE_KEY = 'aiStoreSettings';
 const CACHE_KEY = 'aiStoreCache';
@@ -14,6 +14,8 @@ interface AiSettings {
     openai: string;
     claude: string;
   };
+  ollamaUrl: string;
+  ollamaModel: string;
 }
 
 interface AiCache {
@@ -26,6 +28,8 @@ function defaultSettings(): AiSettings {
     enabled: false,
     provider: 'gemini',
     keys: { gemini: '', openai: '', claude: '' },
+    ollamaUrl: 'http://localhost:11434',
+    ollamaModel: '',
   };
 }
 
@@ -39,6 +43,8 @@ function loadSettings(): AiSettings {
       enabled: parsed.enabled ?? defaults.enabled,
       provider: parsed.provider ?? defaults.provider,
       keys: { ...defaults.keys, ...parsed.keys },
+      ollamaUrl: parsed.ollamaUrl ?? defaults.ollamaUrl,
+      ollamaModel: parsed.ollamaModel ?? defaults.ollamaModel,
     };
   } catch {
     return defaultSettings();
@@ -73,10 +79,12 @@ export const useAiStore = defineStore('ai', {
 
   getters: {
     currentKey(state): string {
-      return state.keys[state.provider] ?? '';
+      if (state.provider === 'ollama') return '';
+      return state.keys[state.provider as keyof typeof state.keys] ?? '';
     },
     hasKey(state): boolean {
-      return !!(state.keys[state.provider] ?? '');
+      if (state.provider === 'ollama') return !!state.ollamaUrl;
+      return !!(state.keys[state.provider as keyof typeof state.keys] ?? '');
     },
   },
 
@@ -87,7 +95,7 @@ export const useAiStore = defineStore('ai', {
     },
 
     clearKey() {
-      this.keys[this.provider] = '';
+      this.keys[this.provider as keyof typeof this.keys] = '';
       this.enabled = false;
       this._save();
     },
@@ -98,7 +106,19 @@ export const useAiStore = defineStore('ai', {
     },
 
     setKey(provider: AiProvider, key: string) {
-      this.keys[provider] = key;
+      if (provider !== 'ollama') {
+        this.keys[provider as keyof typeof this.keys] = key;
+        this._save();
+      }
+    },
+
+    setOllamaUrl(url: string) {
+      this.ollamaUrl = url;
+      this._save();
+    },
+
+    setOllamaModel(model: string) {
+      this.ollamaModel = model;
       this._save();
     },
 
@@ -114,6 +134,8 @@ export const useAiStore = defineStore('ai', {
         enabled: this.enabled,
         provider: this.provider,
         keys: { ...this.keys },
+        ollamaUrl: this.ollamaUrl,
+        ollamaModel: this.ollamaModel,
       });
     },
 
@@ -133,14 +155,21 @@ Please analyze this data and provide:
 4. Notable clusters or streaks
 5. Any general theories or lifestyle suggestions based on the timing patterns
 
-Keep your response concise and practical. If there is not enough data to draw conclusions, say so clearly.`;
+Keep your response concise, minimal, and practical. If there is not enough data to draw conclusions, say so clearly. Return your response as markdown-formatted text.`;
     },
 
     async analyze(entries: CalendarEntry[]) {
-      const key = this.keys[this.provider];
-      if (!key) {
-        this.error = `No API key set for ${this.provider}. Add one in Settings.`;
-        return;
+      if (this.provider === 'ollama') {
+        if (!this.ollamaUrl) {
+          this.error = 'No Ollama URL set. Add one in Settings.';
+          return;
+        }
+      } else {
+        const key = this.keys[this.provider as keyof typeof this.keys];
+        if (!key) {
+          this.error = `No API key set for ${this.provider}. Add one in Settings.`;
+          return;
+        }
       }
 
       this.isLoading = true;
@@ -149,6 +178,8 @@ Keep your response concise and practical. If there is not enough data to draw co
 
       try {
         const prompt = this._buildPrompt(entries);
+        const key =
+          this.provider !== 'ollama' ? this.keys[this.provider as keyof typeof this.keys] : '';
 
         if (this.provider === 'gemini') {
           this.response = await this._callGemini(key, prompt);
@@ -156,6 +187,8 @@ Keep your response concise and practical. If there is not enough data to draw co
           this.response = await this._callOpenAI(key, prompt);
         } else if (this.provider === 'claude') {
           this.response = await this._callClaude(key, prompt);
+        } else if (this.provider === 'ollama') {
+          this.response = await this._callOllama(this.ollamaUrl, prompt);
         }
 
         this.lastAnalyzedAt = new Date().toISOString();
@@ -228,6 +261,41 @@ Keep your response concise and practical. If there is not enough data to draw co
       }
       const data = await res.json();
       return data.content?.[0]?.text ?? 'No response received.';
+    },
+
+    async _callOllama(baseUrl: string, prompt: string): Promise<string> {
+      const url = baseUrl.replace(/\/$/, '') + '/api/generate';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept-Encoding': 'identity' },
+        body: JSON.stringify({ model: this.ollamaModel || 'llama3.2', prompt }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error ?? `Ollama error ${res.status}`);
+      }
+
+      const reader = res.body!.getReader();
+      const decoder = new TextDecoder();
+      let result = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        for (const line of decoder.decode(value).split('\n')) {
+          if (!line) continue;
+          try {
+            const chunk = JSON.parse(line);
+            if (chunk.response) {
+              result += chunk.response;
+              this.response = result;
+            }
+            if (chunk.done) return result;
+          } catch {}
+        }
+      }
+
+      return result || 'No response received.';
     },
   },
 });

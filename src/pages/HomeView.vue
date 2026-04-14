@@ -114,7 +114,10 @@ function setToday() {
         @navigation="changeCurrentView"
       />
 
-      <div class="border-t border-gray-700 pt-4 flex-1 px-3 min-h-0 overflow-y-auto" v-auto-animate>
+      <div
+        class="border-t border-current/10 pt-4 flex-1 px-3 min-h-0 overflow-y-auto"
+        v-auto-animate
+      >
         <div
           v-for="item in currentMonthItems"
           :key="item.date"

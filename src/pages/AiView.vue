@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useMemoryStore, useAiStore } from '@/stores';
+import { marked } from 'marked';
 import dayjs from 'dayjs';
 
 const memoryStore = useMemoryStore();
 const aiStore = useAiStore();
+const showRegenerateModal = ref(false);
 
 const lastAnalyzedLabel = computed(() => {
   if (!aiStore.lastAnalyzedAt) return null;
@@ -18,6 +20,8 @@ onMounted(() => {
 function analyze() {
   aiStore.analyze(memoryStore.getAll());
 }
+
+const html = computed(() => marked(aiStore?.response?.replace(/^<!-- .* -->\n/, '') || ''));
 </script>
 
 <template>
@@ -43,33 +47,90 @@ function analyze() {
       {{ aiStore.error }}
     </div>
 
-    <!-- Response -->
-    <div v-if="aiStore.response" class="flex-1 overflow-y-auto">
-      <div class="border border-gray-700 rounded-lg p-4">
-        <div class="flex justify-between items-center mb-3">
-          <p class="text-xs uppercase tracking-wider opacity-40">Analysis</p>
-          <p v-if="lastAnalyzedLabel" class="text-xs opacity-40">{{ lastAnalyzedLabel }}</p>
-        </div>
-        <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ aiStore.response }}</p>
+    <!-- Loading state -->
+    <div v-if="aiStore.isLoading" class="flex-1 flex flex-col items-center gap-4 justify-center">
+      <q-spinner color="primary" size="50px" />
+      <p>Your response is being generated...</p>
+    </div>
+
+    <!-- Response box (always full height) -->
+    <div
+      v-else-if="aiStore.response"
+      class="flex-1 min-h-0 border border-current/10 rounded-lg flex flex-col"
+    >
+      <!-- Box header -->
+      <div class="flex justify-between items-center px-4 pt-3 pb-2 shrink-0">
+        <p v-if="lastAnalyzedLabel" class="text-xs opacity-40 m-0">{{ lastAnalyzedLabel }}</p>
+        <q-btn
+          flat
+          round
+          size="sm"
+          color="white"
+          class="opacity-80"
+          icon="sym_o_refresh"
+          :loading="aiStore.isLoading"
+          :disable="aiStore.isLoading || !aiStore.hasKey"
+          @click="showRegenerateModal = true"
+        />
+      </div>
+      <!-- Scrollable content -->
+      <div class="flex-1 overflow-y-auto px-4 pb-4">
+        <p v-if="aiStore.response" class="markdown text-sm m-0" v-html="html" />
+        <p v-else class="text-sm opacity-30 m-0 pt-6 text-center">No analysis yet.</p>
       </div>
     </div>
 
     <!-- Analyze button -->
-    <q-btn
-      unelevated
-      no-caps
-      :label="aiStore.isLoading ? 'Analyzing...' : 'Analyze My Migraines'"
-      color="primary"
-      class="w-full mt-2"
-      :loading="aiStore.isLoading"
-      :disable="aiStore.isLoading || !aiStore.hasKey"
-      @click="analyze"
-    />
+    <div v-else class="mt-4 text-center">
+      <p>
+        You can use your AI model to analyze your migraine data for any possible trends. This
+        process may take a few moments.
+      </p>
+      <q-btn
+        unelevated
+        no-caps
+        :label="aiStore.isLoading ? 'Analyzing...' : 'Analyze My Migraines'"
+        color="primary"
+        class="w-full mt-2 shrink-0"
+        :loading="aiStore.isLoading"
+        :disable="aiStore.isLoading || !aiStore.hasKey"
+        @click="analyze"
+      />
+    </div>
 
-    <!-- Entry count context -->
-    <p class="text-sm opacity-50 text-center mt-2">
-      {{ memoryStore.entries.length }} entries in your history
-    </p>
+    <q-dialog v-model="showRegenerateModal" class="shadow-none">
+      <q-card class="shadow-none" style="min-width: 260px">
+        <q-card-section>
+          <p class="text-xl font-semibold mb-0">Regenerate Response?</p>
+        </q-card-section>
+        <q-card-section class="q-pt-none">
+          <p class="mb-4">
+            Are you sure you want to regenerate the AI response? This will overwrite your previous
+            response.
+          </p>
+          <div class="flex flex-col gap-2">
+            <q-btn
+              unelevated
+              no-caps
+              label="Regenerate"
+              color="primary"
+              class="flex-1"
+              @click="
+                showRegenerateModal = false;
+                analyze();
+              "
+            />
+            <q-btn
+              unelevated
+              no-caps
+              label="Cancel"
+              class="flex-1"
+              @click="showRegenerateModal = false"
+            />
+          </div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </div>
 </template>
 

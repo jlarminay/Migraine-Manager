@@ -18,7 +18,7 @@ import { ImportExportButtons, SystemData } from '@/components';
         <a
           href="https://github.com/jlarminay/Migraine-Manager"
           target="_blank"
-          class="flex-1 flex flex-col items-center gap-1 py-3 rounded-lg border border-gray-200 dark:border-gray-700 no-underline text-inherit"
+          class="flex-1 flex flex-col items-center gap-1 py-3 rounded-lg border border-current/10 no-underline text-inherit"
         >
           <q-icon name="img:/github.svg" size="28px" class="invert" />
           <span class="text-sm">Github</span>
@@ -26,7 +26,7 @@ import { ImportExportButtons, SystemData } from '@/components';
         <a
           href="https://joshlarminay.com"
           target="_blank"
-          class="flex-1 flex flex-col items-center gap-1 py-3 rounded-lg border border-gray-200 dark:border-gray-700 no-underline text-inherit"
+          class="flex-1 flex flex-col items-center gap-1 py-3 rounded-lg border border-current/10 no-underline text-inherit"
         >
           <q-icon name="sym_o_language" size="28px" />
           <span class="text-sm">Website</span>

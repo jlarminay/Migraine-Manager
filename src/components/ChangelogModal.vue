@@ -14,7 +14,7 @@ const html = marked(changelogRaw.replace(/^<!-- .* -->\n/, ''));
       </q-card-section>
 
       <q-card-section class="overflow-y-auto" style="max-height: 70vh">
-        <div class="changelog" v-html="html" />
+        <div class="markdown" v-html="html" />
       </q-card-section>
     </q-card>
   </q-dialog>

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { useMemoryStore } from '@/stores';
+import { useMemoryStore, useAiStore } from '@/stores';
 import { ClearMemoryModal } from '@/components';
 
+const aiStore = useAiStore();
 const memoryStore = useMemoryStore();
 const fileInput = ref<HTMLInputElement | null>(null);
 const showClearModal = ref(false);
@@ -51,7 +52,7 @@ const showClearModal = ref(false);
         no-caps
         label="Clear All Data"
         color="negative"
-        class="w-full"
+        class="w-full mb-2"
         @click="showClearModal = true"
       />
     </div>
@@ -59,6 +60,8 @@ const showClearModal = ref(false);
     <ClearMemoryModal
       v-model="showClearModal"
       @clear="
+        aiStore.clearKey();
+        aiStore.clearResponse();
         memoryStore.clearMemory();
         showClearModal = false;
       "

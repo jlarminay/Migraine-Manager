@@ -12,6 +12,7 @@ const providerLabels: Record<string, string> = {
   gemini: 'Gemini',
   openai: 'OpenAI',
   claude: 'Claude',
+  ollama: 'Ollama',
 };
 
 function handleAiClick() {

@@ -6,21 +6,34 @@
   padding: 0 !important;
 }
 
-/* Changelog modal */
-.changelog h1 {
+/* Markdown modal */
+.markdown h1 {
   @apply hidden;
 }
-.changelog h2 {
+.markdown h2 {
   @apply text-base font-semibold mt-5 mb-1;
 }
-.changelog h2:first-of-type {
+.markdown h2:first-of-type {
   @apply mt-0;
 }
-.changelog ul {
-  @apply m-0 pl-5 list-disc;
+.markdown h3 {
+  @apply text-sm font-semibold mt-6 mb-1;
 }
-.changelog li {
-  @apply text-sm opacity-75 mb-0.5;
+.markdown h3:first-of-type {
+  @apply mt-0;
+}
+.markdown ul,
+.markdown ol {
+  @apply m-0 pl-5 list-disc mb-4;
+}
+.markdown ol ul,
+.markdown ul ol,
+.markdown ul ul,
+.markdown ol ol {
+  @apply mb-1;
+}
+.markdown li {
+  @apply text-sm opacity-75 mb-1;
 }
 
 /* Overrides for toaster */
